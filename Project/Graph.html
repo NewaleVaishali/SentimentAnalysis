@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="pragma" content="no-cache" />
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="styles.css">
+    <title>Dashboard</title>
+    <script src="countingScript.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="topbar">
+            <div class="logo">
+                <h2>Logo</h2>
+            </div>
+            
+            
+          
+        </div>
+        <div class="sidebar">
+            <ul>
+                <li>
+                    <a href="upload1.php">
+                        <i class="fas fa-file-upload"></i>
+                        <div>Dashboard</div>
+                    </a>
+                </li>
+             
+            </ul>
+        </div>
+        <div class="main">
+            <div class="cards">
+                <div class="card">
+                    <div class="card-content">
+                        <div id="output" class="number">Positive</div>
+                        <div class="card-name">Positive Reviews</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div id="outputNeg" class="number">Negative</div>
+                        <div class="card-name">Negative Reviews</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fas fa-frown"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div id="outputNeu" class="number">Neutral</div>
+                        <div class="card-name">Neutral Revies</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fas fa-meh"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div id="Total" class="number">Total</div>
+                        <div class="card-name">Total Reviews</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fas fa-poll"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="charts">
+                <div class="chart">
+                    <h2>Sentiments of each brand</h2>
+                    <div>
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="photo">
+                    <img src="PREDICT_SENTIMENTS/results/image.png">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script>
+       //setup block
+
+       //config
+       var ctx = document.getElementById('barChart').getContext('2d');
+       var labels = [];
+       var data = [];
+       var posdata = [];
+       var negdata = [];
+       var neudata = [];
+       
+       function updateChart() {
+         fetch('PREDICT_SENTIMENTS/results/counts.csv')
+           .then(response => response.text())
+           .then(text => {
+             labels = [];
+             data = [];
+             posdata = [];
+             negdata = [];
+             neudata = [];
+       
+             var lines = text.split('\n');
+             for (var i = 0; i < lines.length; i++) {
+               var values = lines[i].split(',');
+       
+               labels.push(values[0]);
+               var temp = [values[1], values[2], values[3]];
+               posdata.push(values[1]);
+               negdata.push(values[2]);
+               neudata.push(values[3]);
+               data.push(temp);
+             }
+       
+             var myChart = new Chart(ctx, {
+               type: 'bar',
+               data: {
+                 labels: labels,
+                 datasets: [
+                   {
+                     label: 'Positive',
+                     data: posdata,
+                     backgroundColor: 'rgba(0, 99, 0, 0.6)',
+                   },
+                   {
+                     label: 'Negative',
+                     data: negdata,
+                     backgroundColor: 'rgba(0, 99, 132, 0.6)',
+                   },
+                   {
+                     label: 'Neutral',
+                     data: neudata,
+                     backgroundColor: 'rgba(0, 0, 132, 0.6)',
+                   }
+                 ]
+               },
+               options: {
+                 responsive: true
+               }
+             });
+       
+             myChart.update();
+           });
+       }
+       
+       updateChart();
+    </script>       
+</body>
+
+
+</html>
